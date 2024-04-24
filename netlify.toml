@@ -5,9 +5,9 @@
 #   commandOrigin= "config"
 #   publishOrigin= "config"
 
-build:
-  command: npm run build
-  commandOrigin: config
-  publish: /opt/build/repo/dist
-  publishOrigin: config
-  functionsDirectory: /opt/build/repo/netlify/functions
+[build]
+  command= "npm run build"
+  commandOrigin= "config"
+  publish= "/opt/build/repo/dist"
+  publishOrigin= "config"
+  functionsDirectory= "/opt/build/repo/netlify/functions"
