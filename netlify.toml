@@ -1,4 +1,2 @@
 [build]
-  command = "npm run build"
-  commandOrigin: "config"
-  publish: "/opt/build/repo/dist"
+  command = "CI = npm run build"
