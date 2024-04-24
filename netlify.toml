@@ -2,5 +2,5 @@
   publish = "dist"
   command = "npm run build"
   functions = "netlify/functions"
-  commandOrigin: config
-  publishOrigin: config
+  commandOrigin= "config"
+  publishOrigin= "config"
