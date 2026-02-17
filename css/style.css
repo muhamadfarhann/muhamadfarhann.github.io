@@ -404,3 +404,33 @@
 	}
 }
 
+.visitor-counter {
+	position: fixed;
+	right: 16px;
+	bottom: 16px;
+	z-index: 10001;
+	display: inline-flex;
+	gap: 8px;
+	align-items: center;
+	padding: 10px 12px;
+	border-radius: 999px;
+	border: 1px solid rgba(255, 255, 255, 0.2);
+	background: rgba(0, 0, 0, 0.55);
+	color: #fff;
+	font-family: 'Playfair Display', serif;
+	font-size: 14px;
+	line-height: 1;
+	pointer-events: none;
+	-webkit-backdrop-filter: blur(6px);
+	backdrop-filter: blur(6px);
+}
+
+.visitor-counter__label {
+	opacity: 0.8;
+}
+
+.visitor-counter__value {
+	font-variant-numeric: tabular-nums;
+	letter-spacing: 0.02em;
+}
+
