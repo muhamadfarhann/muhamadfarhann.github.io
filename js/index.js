@@ -20,18 +20,19 @@ async function updateVisitorCounter() {
 	const formatter = new Intl.NumberFormat("id-ID");
 	const namespace = "muhamadfarhann-github-io";
 	const key = "index";
-	const sessionKey = `visited:${namespace}:${key}`;
+	const hitWindowMs = 24 * 60 * 60 * 1000;
+	const storageKey = `lastHitAt:${namespace}:${key}`;
+	const lastHitAt = Number(localStorage.getItem(storageKey) || 0);
+	const shouldHit = !lastHitAt || Date.now() - lastHitAt > hitWindowMs;
 	const resource = `${encodeURIComponent(namespace)}/${encodeURIComponent(key)}`;
 	const baseUrl = "https://api.countapi.xyz";
 
 	try {
-		const value = sessionStorage.getItem(sessionKey)
-			? await fetchCountApiValue(`${baseUrl}/get/${resource}`)
-			: await fetchCountApiValue(`${baseUrl}/hit/${resource}`);
+		const value = shouldHit
+			? await fetchCountApiValue(`${baseUrl}/hit/${resource}`)
+			: await fetchCountApiValue(`${baseUrl}/get/${resource}`);
 
-		if (!sessionStorage.getItem(sessionKey)) {
-			sessionStorage.setItem(sessionKey, "1");
-		}
+		if (shouldHit) localStorage.setItem(storageKey, String(Date.now()));
 
 		valueEl.textContent = formatter.format(value);
 	} catch {
