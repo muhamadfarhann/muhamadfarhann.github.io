@@ -47,33 +47,34 @@ import { initDemo } from '../js/style.js';
 const bgAudio = ref(null);
 const bgMp3 = encodeURI('/ABBIE FALLS - Victim.mp3');
 
+async function tryStartAudio() {
+  const el = bgAudio.value;
+  if (!el) return false;
+  try {
+    el.muted = false;
+    await el.play();
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 onMounted(() => {
   initDemo();
-
-  const el = bgAudio.value;
-  if (!el) return;
-
   const unlock = async () => {
-    try {
-      el.muted = false;
-      await el.play();
-    } catch {
-    }
+    const ok = await tryStartAudio();
+    if (!ok) return;
+    window.removeEventListener('pointerdown', unlock, { capture: true });
+    window.removeEventListener('touchstart', unlock, { capture: true });
+    window.removeEventListener('keydown', unlock, { capture: true });
   };
 
   (async () => {
-    try {
-      el.muted = false;
-      await el.play();
-    } catch {
-      try {
-        el.muted = true;
-        await el.play();
-        window.addEventListener('pointerdown', unlock, { capture: true, once: true });
-        window.addEventListener('touchstart', unlock, { capture: true, once: true });
-      } catch {
-      }
-    }
+    const ok = await tryStartAudio();
+    if (ok) return;
+    window.addEventListener('pointerdown', unlock, { capture: true, once: true });
+    window.addEventListener('touchstart', unlock, { capture: true, once: true });
+    window.addEventListener('keydown', unlock, { capture: true, once: true });
   })();
 });
 </script>
