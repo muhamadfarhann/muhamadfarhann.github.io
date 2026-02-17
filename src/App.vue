@@ -35,7 +35,13 @@
       <h2 class="content__title">We Are Looking For Justice</h2>
     </div>
   </main>
-  <audio ref="bgAudio" preload="auto" loop style="display: none">
+  <audio
+    ref="bgAudio"
+    preload="auto"
+    loop
+    playsinline
+    style="position: fixed; width: 1px; height: 1px; opacity: 0; pointer-events: none"
+  >
     <source :src="bgMp3" type="audio/mpeg" />
   </audio>
 </template>
@@ -46,13 +52,16 @@ import { initDemo } from '../js/style.js';
 
 const bgAudio = ref(null);
 const bgMp3 = encodeURI('/ABBIE FALLS - Victim.mp3');
+const startedMuted = ref(false);
 
-async function tryStartAudio() {
+async function tryStartAudio({ muted }) {
   const el = bgAudio.value;
   if (!el) return false;
   try {
-    el.muted = false;
+    el.muted = muted;
+    if (el.readyState === 0) el.load();
     await el.play();
+    startedMuted.value = muted;
     return true;
   } catch {
     return false;
@@ -61,20 +70,70 @@ async function tryStartAudio() {
 
 onMounted(() => {
   initDemo();
-  const unlock = async () => {
-    const ok = await tryStartAudio();
-    if (!ok) return;
+  let unlocking = false;
+
+  const removeUnlockListeners = () => {
     window.removeEventListener('pointerdown', unlock, { capture: true });
+    window.removeEventListener('pointerup', unlock, { capture: true });
     window.removeEventListener('touchstart', unlock, { capture: true });
+    window.removeEventListener('touchend', unlock, { capture: true });
+    window.removeEventListener('touchmove', unlock, { capture: true });
+    window.removeEventListener('click', unlock, { capture: true });
     window.removeEventListener('keydown', unlock, { capture: true });
+    window.removeEventListener('wheel', unlock, { capture: true });
+    window.removeEventListener('scroll', unlock, { capture: true });
+  };
+
+  const addUnlockListeners = () => {
+    window.addEventListener('pointerdown', unlock, { capture: true });
+    window.addEventListener('pointerup', unlock, { capture: true });
+    window.addEventListener('touchstart', unlock, { capture: true });
+    window.addEventListener('touchend', unlock, { capture: true });
+    window.addEventListener('touchmove', unlock, { capture: true, passive: true });
+    window.addEventListener('click', unlock, { capture: true });
+    window.addEventListener('keydown', unlock, { capture: true });
+    window.addEventListener('wheel', unlock, { capture: true, passive: true });
+    window.addEventListener('scroll', unlock, { capture: true, passive: true });
+  };
+
+  const unlock = async () => {
+    if (unlocking) return;
+    unlocking = true;
+
+    const el = bgAudio.value;
+    if (!el) {
+      unlocking = false;
+      return;
+    }
+
+    if (startedMuted.value) {
+      try {
+        el.muted = false;
+        await el.play();
+        startedMuted.value = false;
+        removeUnlockListeners();
+      } catch {
+      }
+      unlocking = false;
+      return;
+    }
+
+    const ok = await tryStartAudio({ muted: false });
+    if (ok) removeUnlockListeners();
+    unlocking = false;
   };
 
   (async () => {
-    const ok = await tryStartAudio();
-    if (ok) return;
-    window.addEventListener('pointerdown', unlock, { capture: true, once: true });
-    window.addEventListener('touchstart', unlock, { capture: true, once: true });
-    window.addEventListener('keydown', unlock, { capture: true, once: true });
+    const okLoud = await tryStartAudio({ muted: false });
+    if (okLoud) return;
+
+    const okMuted = await tryStartAudio({ muted: true });
+    if (okMuted) {
+      addUnlockListeners();
+      return;
+    }
+
+    addUnlockListeners();
   })();
 });
 </script>
