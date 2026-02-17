@@ -35,19 +35,45 @@
       <h2 class="content__title">We Are Looking For Justice</h2>
     </div>
   </main>
-  <div class="visitor-counter" role="status" aria-label="Jumlah pengunjung website">
-    <span class="visitor-counter__label"></span>
-    <span class="visitor-counter__value" id="visitorCount">—</span>
-  </div>
+  <audio ref="bgAudio" preload="auto" loop style="display: none">
+    <source :src="bgMp3" type="audio/mpeg" />
+  </audio>
 </template>
 
 <script setup>
-import { onMounted } from 'vue';
-import { initCounter } from '../js/index.js';
+import { onMounted, ref } from 'vue';
 import { initDemo } from '../js/style.js';
 
+const bgAudio = ref(null);
+const bgMp3 = encodeURI('/ABBIE FALLS - Victim.mp3');
+
 onMounted(() => {
-  initCounter();
   initDemo();
+
+  const el = bgAudio.value;
+  if (!el) return;
+
+  const unlock = async () => {
+    try {
+      el.muted = false;
+      await el.play();
+    } catch {
+    }
+  };
+
+  (async () => {
+    try {
+      el.muted = false;
+      await el.play();
+    } catch {
+      try {
+        el.muted = true;
+        await el.play();
+        window.addEventListener('pointerdown', unlock, { capture: true, once: true });
+        window.addEventListener('touchstart', unlock, { capture: true, once: true });
+      } catch {
+      }
+    }
+  })();
 });
 </script>
