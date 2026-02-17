@@ -36,7 +36,7 @@
     </div>
   </main>
   <div class="visitor-counter" role="status" aria-label="Jumlah pengunjung website">
-    <span class="visitor-counter__label">Visitors</span>
+    <span class="visitor-counter__label"></span>
     <span class="visitor-counter__value" id="visitorCount">—</span>
   </div>
 </template>
