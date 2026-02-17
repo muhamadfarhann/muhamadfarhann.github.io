@@ -9,8 +9,11 @@ async function fetchCountApiValue(url) {
 	const res = await fetch(url, { cache: "no-store" });
 	if (!res.ok) throw new Error("Request failed");
 	const data = await res.json();
-	if (!data || typeof data.value !== "number") throw new Error("Invalid response");
-	return data.value;
+	// counterapi.dev returns { count: number }
+	if (data && typeof data.count === "number") return data.count;
+	// countapi.xyz returns { value: number }
+	if (data && typeof data.value === "number") return data.value;
+	throw new Error("Invalid response");
 }
 
 async function updateVisitorCounter() {
@@ -18,29 +21,44 @@ async function updateVisitorCounter() {
 	if (!valueEl) return;
 
 	const formatter = new Intl.NumberFormat("id-ID");
-	const namespace = "muhamadfarhann-github-io";
+	// counterapi.dev uses simpler structure, usually just a namespace/key or just key
+	// Let's use muhamadfarhann.github.io as the namespace and index as the key
+	const namespace = "muhamadfarhann.github.io";
 	const key = "index";
-	const hitWindowMs = 24 * 60 * 60 * 1000;
-	const storageKey = `lastHitAt:${namespace}:${key}`;
-	const lastHitAt = Number(localStorage.getItem(storageKey) || 0);
-	const shouldHit = !lastHitAt || Date.now() - lastHitAt > hitWindowMs;
+	
+	// const hitWindowMs = 24 * 60 * 60 * 1000;
+	// const storageKey = `lastHitAt:${namespace}:${key}`;
+	// const lastHitAt = Number(localStorage.getItem(storageKey) || 0);
+	// const shouldHit = !lastHitAt || Date.now() - lastHitAt > hitWindowMs;
+	
+	// Set to true if you want to count every refresh (for testing or simple counter)
+	const shouldHit = true;
+	
+	// counterapi.dev endpoints:
+	// GET /v1/{namespace}/{key}/up - Increment and get
+	// GET /v1/{namespace}/{key}    - Get only
+	const baseUrl = "https://api.counterapi.dev/v1";
 	const resource = `${encodeURIComponent(namespace)}/${encodeURIComponent(key)}`;
-	const baseUrl = "https://api.countapi.xyz";
 
 	try {
-		const value = shouldHit
-			? await fetchCountApiValue(`${baseUrl}/hit/${resource}`)
-			: await fetchCountApiValue(`${baseUrl}/get/${resource}`);
+		// Always fetch current count regardless of hit status to ensure display is correct
+		// If we should hit, we use /up endpoint, otherwise just get current count
+		const url = shouldHit
+			? `${baseUrl}/${resource}/up`
+			: `${baseUrl}/${resource}`;
+			
+		const value = await fetchCountApiValue(url);
 
 		if (shouldHit) localStorage.setItem(storageKey, String(Date.now()));
 
 		valueEl.textContent = formatter.format(value);
-	} catch {
+	} catch (e) {
+		console.warn("Counter API failed", e);
 		valueEl.textContent = "—";
 	}
 }
 
-document.addEventListener("DOMContentLoaded", () => {
+export function initCounter() {
 	updateLocalCounter();
 	updateVisitorCounter();
-});
+}

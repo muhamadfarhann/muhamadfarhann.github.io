@@ -8,7 +8,7 @@
  * Copyright 2017, Codrops
  * http://www.codrops.com
  */
-{
+export function initDemo() {
 	setTimeout(() => document.body.classList.add('render'), 60);
 	const navdemos = Array.from(document.querySelectorAll('nav.demos > .demo'));
 	const total = navdemos.length;
@@ -35,7 +35,7 @@
 		}
 		navigate(linkEl);
 	});
-	imagesLoaded('.glitch__img', { background: true }, () => {
+	window.imagesLoaded('.glitch__img', { background: true }, () => {
 		document.body.classList.remove('loading');
 		document.body.classList.add('imgloaded');
 	});
