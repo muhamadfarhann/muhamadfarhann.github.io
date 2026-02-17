@@ -26,18 +26,19 @@ async function updateVisitorCounter() {
 	const namespace = "muhamadfarhann.github.io";
 	const key = "index";
 	
-	// const hitWindowMs = 24 * 60 * 60 * 1000;
-	// const storageKey = `lastHitAt:${namespace}:${key}`;
-	// const lastHitAt = Number(localStorage.getItem(storageKey) || 0);
-	// const shouldHit = !lastHitAt || Date.now() - lastHitAt > hitWindowMs;
-	
-	// Set to true if you want to count every refresh (for testing or simple counter)
-	const shouldHit = true;
+	const storageKey = `lastHitAt:${namespace}:${key}`;
+
+	// Check if we have hit this counter in the last 24 hours
+	const hitWindowMs = 24 * 60 * 60 * 1000;
+	const lastHitAt = Number(localStorage.getItem(storageKey) || 0);
+	const shouldHit = !lastHitAt || Date.now() - lastHitAt > hitWindowMs;
 	
 	// counterapi.dev endpoints:
 	// GET /v1/{namespace}/{key}/up - Increment and get
 	// GET /v1/{namespace}/{key}    - Get only
 	const baseUrl = "https://api.counterapi.dev/v1";
+	// Note: counterapi.dev treats namespace and key separately in the URL path, not combined
+	// Correct format: /v1/{namespace}/{key}/up
 	const resource = `${encodeURIComponent(namespace)}/${encodeURIComponent(key)}`;
 
 	try {
@@ -47,7 +48,9 @@ async function updateVisitorCounter() {
 			? `${baseUrl}/${resource}/up`
 			: `${baseUrl}/${resource}`;
 			
+		console.log("Fetching counter from:", url);
 		const value = await fetchCountApiValue(url);
+		console.log("Counter value:", value);
 
 		if (shouldHit) localStorage.setItem(storageKey, String(Date.now()));
 
