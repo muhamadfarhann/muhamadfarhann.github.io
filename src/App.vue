@@ -25,14 +25,14 @@
       </nav>
     </div>
     <div class="content">
-      <div class="glitch">
+      <div class="glitch" ref="parallaxBg">
         <div class="glitch__img"></div>
         <div class="glitch__img"></div>
         <div class="glitch__img"></div>
         <div class="glitch__img"></div>
         <div class="glitch__img"></div>
       </div>
-      <h2 class="content__title">We Are Looking For Justice</h2>
+      <h2 class="content__title" ref="parallaxTitle">We Are Looking For Justice</h2>
     </div>
   </main>
   <audio
@@ -47,12 +47,17 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue';
+import { onMounted, onUnmounted, ref } from 'vue';
 import { initDemo } from '../js/style.js';
 
 const bgAudio = ref(null);
 const bgMp3 = encodeURI('/ABBIE FALLS - Victim.mp3');
 const startedMuted = ref(false);
+const parallaxBg = ref(null);
+const parallaxTitle = ref(null);
+
+// Detect if mobile device
+const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
 
 async function tryStartAudio({ muted }) {
   const el = bgAudio.value;
@@ -70,6 +75,42 @@ async function tryStartAudio({ muted }) {
 
 onMounted(() => {
   initDemo();
+  
+  // Parallax effect based on mouse/touch movement
+  const handleMouseMove = (e) => {
+    const x = e.clientX / window.innerWidth - 0.5; // -0.5 to 0.5
+    const y = e.clientY / window.innerHeight - 0.5;
+    
+    if (parallaxBg.value) {
+      parallaxBg.value.style.transform = `translate(${x * 30}px, ${y * 30}px)`;
+    }
+    
+    if (parallaxTitle.value) {
+      parallaxTitle.value.style.transform = `translate(${x * -20}px, ${y * -20}px)`;
+    }
+  };
+  
+  const handleTouchMove = (e) => {
+    e.preventDefault(); // Prevent scrolling
+    const touch = e.touches[0];
+    const x = touch.clientX / window.innerWidth - 0.5;
+    const y = touch.clientY / window.innerHeight - 0.5;
+    
+    if (parallaxBg.value) {
+      parallaxBg.value.style.transform = `translate(${x * 30}px, ${y * 30}px)`;
+    }
+    
+    if (parallaxTitle.value) {
+      parallaxTitle.value.style.transform = `translate(${x * -20}px, ${y * -20}px)`;
+    }
+  };
+  
+  if (isMobile) {
+    window.addEventListener('touchmove', handleTouchMove, { passive: false });
+  } else {
+    window.addEventListener('mousemove', handleMouseMove);
+  }
+  
   let unlocking = false;
 
   const removeUnlockListeners = () => {
@@ -135,5 +176,13 @@ onMounted(() => {
 
     addUnlockListeners();
   })();
+});
+
+onUnmounted(() => {
+  if (isMobile) {
+    window.removeEventListener('touchmove', handleTouchMove);
+  } else {
+    window.removeEventListener('mousemove', handleMouseMove);
+  }
 });
 </script>

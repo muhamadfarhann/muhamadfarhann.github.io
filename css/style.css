@@ -22,6 +22,14 @@
 	--blend-color-5: #af4949;
 }
 
+body {
+	overflow: hidden;
+	margin: 0;
+	padding: 0;
+	height: 100vh;
+	width: 100vw;
+}
+
 .imgloaded .content__title,
 .imgloaded .content__text {
 	animation-name: glitch-anim-text;
@@ -36,6 +44,8 @@
 	position: relative;
 	font-family: 'Playfair Display', serif;
 	animation-delay: calc(var(--delay-anim) + var(--time-anim) * 0.2);
+	will-change: transform;
+	transition: transform 0.1s ease-out;
 }
 
 @media screen and (max-width: 768px) {
@@ -87,6 +97,8 @@
 	width: var(--glitch-width);
 	height: var(--glitch-height);
 	overflow: hidden;
+	will-change: transform;
+	transition: transform 0.1s ease-out;
 }
 
 .glitch__img {
