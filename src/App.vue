@@ -124,9 +124,6 @@ onMounted(() => {
     
     if (parallaxTitle.value) {
       // 3D Tilt Effect
-      // x * maxTilt, y * maxTilt
-      // Note: RotateX is based on Y movement, RotateY is based on X movement
-      // Multiply by -1 to invert tilt direction if needed
       const tiltX = y * 20; // Max 10 degrees
       const tiltY = x * -20; // Max 10 degrees
       
