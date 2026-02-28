@@ -1,4 +1,5 @@
 <template>
+  <MatrixRain />
   <svg class="hidden">
     <symbol id="icon-arrow" viewBox="0 0 25 25">
       <title>whatsapp</title>
@@ -32,7 +33,7 @@
         <div class="glitch__img"></div>
         <div class="glitch__img"></div>
       </div>
-      <h2 class="content__title" ref="parallaxTitle">We Are Looking For Justice</h2>
+      <h2 class="content__title" ref="parallaxTitle" data-value="We Are Looking For Justice">We Are Looking For Justice</h2>
     </div>
   </main>
   <audio
@@ -49,12 +50,44 @@
 <script setup>
 import { onMounted, onUnmounted, ref } from 'vue';
 import { initDemo } from '../js/style.js';
+import MatrixRain from './components/MatrixRain.vue';
 
 const bgAudio = ref(null);
 const bgMp3 = encodeURI('/ABBIE FALLS - Victim.mp3');
 const startedMuted = ref(false);
 const parallaxBg = ref(null);
 const parallaxTitle = ref(null);
+
+const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!@#$%^&*()";
+let animationInterval = null;
+
+const animateText = () => {
+  if (!parallaxTitle.value) return;
+  
+  let iteration = 0;
+  const originalText = parallaxTitle.value.dataset.value;
+  
+  clearInterval(animationInterval);
+  
+  animationInterval = setInterval(() => {
+    parallaxTitle.value.innerText = originalText
+      .split("")
+      .map((letter, index) => {
+        if(index < iteration) {
+          return originalText[index];
+        }
+      
+        return letters[Math.floor(Math.random() * letters.length)]
+      })
+      .join("");
+    
+    if(iteration >= originalText.length){ 
+      clearInterval(animationInterval);
+    }
+    
+    iteration += 1 / 2;
+  }, 50);
+};
 
 // Detect if mobile device
 const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
@@ -75,6 +108,7 @@ async function tryStartAudio({ muted }) {
 
 onMounted(() => {
   initDemo();
+  animateText();
   
   // Parallax effect based on mouse/touch movement
   const handleMouseMove = (e) => {
