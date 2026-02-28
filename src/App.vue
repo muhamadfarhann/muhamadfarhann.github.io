@@ -33,7 +33,9 @@
         <div class="glitch__img"></div>
         <div class="glitch__img"></div>
       </div>
-      <h2 class="content__title" ref="parallaxTitle" data-value="We Are Looking For Justice">We Are Looking For Justice</h2>
+      <div class="tilt-wrapper" ref="parallaxTitle">
+        <h2 class="content__title" ref="decryptText" data-value="We Are Looking For Justice">We Are Looking For Justice</h2>
+      </div>
     </div>
   </main>
   <audio
@@ -57,20 +59,21 @@ const bgMp3 = encodeURI('/ABBIE FALLS - Victim.mp3');
 const startedMuted = ref(false);
 const parallaxBg = ref(null);
 const parallaxTitle = ref(null);
+const decryptText = ref(null);
 
 const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!@#$%^&*()";
 let animationInterval = null;
 
 const animateText = () => {
-  if (!parallaxTitle.value) return;
+  if (!decryptText.value) return;
   
   let iteration = 0;
-  const originalText = parallaxTitle.value.dataset.value;
+  const originalText = decryptText.value.dataset.value;
   
   clearInterval(animationInterval);
   
   animationInterval = setInterval(() => {
-    parallaxTitle.value.innerText = originalText
+    decryptText.value.innerText = originalText
       .split("")
       .map((letter, index) => {
         if(index < iteration) {
@@ -120,7 +123,14 @@ onMounted(() => {
     }
     
     if (parallaxTitle.value) {
-      parallaxTitle.value.style.transform = `translate(${x * -20}px, ${y * -20}px)`;
+      // 3D Tilt Effect
+      // x * maxTilt, y * maxTilt
+      // Note: RotateX is based on Y movement, RotateY is based on X movement
+      // Multiply by -1 to invert tilt direction if needed
+      const tiltX = y * 20; // Max 10 degrees
+      const tiltY = x * -20; // Max 10 degrees
+      
+      parallaxTitle.value.style.transform = `perspective(1000px) rotateX(${tiltX}deg) rotateY(${tiltY}deg) scale(1.05)`;
     }
   };
   
@@ -135,7 +145,9 @@ onMounted(() => {
     }
     
     if (parallaxTitle.value) {
-      parallaxTitle.value.style.transform = `translate(${x * -20}px, ${y * -20}px)`;
+       const tiltX = y * 20;
+       const tiltY = x * -20;
+       parallaxTitle.value.style.transform = `perspective(1000px) rotateX(${tiltX}deg) rotateY(${tiltY}deg) scale(1.05)`;
     }
   };
   
@@ -220,3 +232,13 @@ onUnmounted(() => {
   }
 });
 </script>
+
+<style scoped>
+.tilt-wrapper {
+  perspective: 1000px;
+  transform-style: preserve-3d;
+  display: block;
+  width: 100%;
+  text-align: center; /* Center the text inside */
+}
+</style>

@@ -454,34 +454,3 @@ body {
 	font-variant-numeric: tabular-nums;
 	letter-spacing: 0.02em;
 }
-
-.content__subtitle {
-	font-family: 'Courier New', Courier, monospace;
-	font-size: 1.5vw;
-	margin-top: -30vh;
-	color: #0F0;
-	position: relative;
-    text-shadow: 0 0 5px #0F0;
-    text-align: center;
-    width: 100%;
-    z-index: 1000;
-}
-
-.cursor {
-	display: inline-block;
-	width: 10px;
-	animation: blink 1s infinite;
-}
-
-@keyframes blink {
-	0%, 100% { opacity: 1; }
-	50% { opacity: 0; }
-}
-
-@media screen and (max-width: 768px) {
-    .content__subtitle {
-        font-size: 1em;
-        margin-top: 10px;
-        text-align: center;
-    }
-}
